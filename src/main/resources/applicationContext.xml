@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--自动扫描service包下的Java Bean(即组件)-->
+    <context:component-scan base-package="com.fengberlin.service" />
+
+    <!--配置数据库参数的属性文件存放的地方-->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+    <!--配置数据库连接池-->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        
+        <property name="maximumPoolSize" value="30" />
+    </bean>
+
+    <!--配置SqlSessionFactory对象-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据库连接池-->
+        <property name="dataSource" ref="dataSource" />
+        <!--配置MyBatis全局配置文件-->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <!--配置使用别名-->
+        <property name="typeAliasesPackage" value="com.fengberlin.dao.entity" />
+        <!--扫描映射mapper所需的xml文件-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+    </bean>
+
+    <!--配置自动扫描Dao接口的包，动态实现Dao接口，注入到Spring IoC容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--注入SqlSessionFactory对象-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <!--给出需要扫描的Dao接口包-->
+        <property name="basePackage" value="com.fengberlin.dao" />
+    </bean>
+
+    <!--配置事务管理器，mybatis使用的是jdbc的事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据库连接池-->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!--配置基于@Transactional注解的声明式事务，默认使用注解来管理事务行为-->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <!--注册RedisDao bean-->
+    <bean id="redisDao" class="com.fengberlin.dao.cache.RedisDao">
+        <constructor-arg index="0" value="localhost" />
+        <constructor-arg index="1" value="6379" />
+    </bean>
+
+</beans>

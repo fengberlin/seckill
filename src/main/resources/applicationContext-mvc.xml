@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--配置Spring MVC-->
+    <!--开启Spring MVC注解模式-->
+    <!--简化配置：自动注册DefaultAnnotationHandlerMapping, AnnotationMethodHandlerAdapter-->
+    <!--提供一系列：数据绑定，数字和日期的format（@NumberFormat, @DataTimeFormat），xml、json默认读写支持-->
+    <mvc:annotation-driven />
+
+    <!--配置静态资源的处理Servlet，它会使用Servlet容器中的默认Servlet
+    来处理对静态资源的请求，还有配置允许使用"/"作整体映射-->
+    <mvc:default-servlet-handler />
+
+    <!--配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!--启用组件扫描，扫描指定包下的Java Bean-->
+    <context:component-scan base-package="com.fengberlin.web" />
+
+</beans>

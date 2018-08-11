@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengberlin.dao.SuccessKilledDao">
+
+    <insert id="insertItem">
+        -- 加入ignore，当插入报错时返回0
+        insert ignore into success_killed(seckill_id, user_Phone, create_time, state)
+        values(#{seckillId,}, #{userPhone}, CURRENT_TIMESTAMP, 0)
+    </insert>
+
+    <select id="queryByIdWithStockItem" resultType="SuccessKilled" parameterType="long">
+        select
+        sk.seckill_id, sk.user_phone, sk.state, sk.create_time,
+        s.seckill_id as "stock.seckill_id", s.name as "stock.name",
+        s.number as "stock.number", s.start_time as "stock.start_time",
+        s.end_time as "stock.end_time", s.create_time as "stock.create_time"
+        from success_killed as sk, stock as s
+        where sk.seckill_id = s.seckill_id
+        and sk.seckill_id = #{seckillId} and sk.user_phone = #{userPhone}
+    </select>
+
+</mapper>
